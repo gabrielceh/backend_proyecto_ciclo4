@@ -277,4 +277,51 @@ app.post('/license_response', (req, res) => {
   res.send({ msg, status, permiso: permisos_req[i] });
 });
 
+/**
+ * API Rest Solicitud certificado laboral
+ * Descripcion: Permite realizar la solicitud de certifiación laboral por medio del id
+ * Ruta: /payment_certificate
+ * Metodo: GET
+ * Datos entrada: { id }
+ * Respuesta: { msg, status, data }
+ */
+
+app.get('/payment_certificate/:id',(req, res) => {
+
+  const { id } = req.params;
+  const id_valid = usuarios.find((us) => us.id === id);
+
+  let msg = '';
+  let status = '';
+
+  if (!id_valid) {
+    msg = 'usuario no valido';
+    status = 400;
+    return res.send({ msg, status, data: null });
+  }
+    let data = {
+      id: id, nombre: id_valid.nombre, apellido: id_valid.apellido, fecha_ingreso: id_valid.fecha_ingreso, salario: id_valid.salario, cargo: id_valid.cargo
+    }
+
+
+    msg = 'Solicitud exitosa';
+    status = 200;
+    res.send({ msg, status, data });
+
+})
+
+/**
+ * API Rest Solicitud certificado laboral
+ * Descripcion: Permite realizar la solicitud de certifiación laboral por medio del id
+ * Ruta: /payment_certificate
+ * Metodo: GET
+ * Datos entrada: { id }
+ * Respuesta: { msg, status, data }
+ */
+app.post('/payment_certificate/:id',(req, res) => {
+
+
+})
+
+
 module.exports = app;

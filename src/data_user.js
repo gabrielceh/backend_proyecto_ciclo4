@@ -9,6 +9,9 @@ const usuarios = [
     direccion: 'calle 12',
     telefono: '300 1234567',
     token: 'EstoDeberiaEstarCifradoYSerUnico',
+    fecha_ingreso: "2021-02-15",
+    salario: "500",
+    cargo: "Administrador Funcional"
   },
   {
     nombre: 'Andrea',
@@ -20,6 +23,9 @@ const usuarios = [
     direccion: 'carrera 45',
     telefono: '315 1234567',
     token: 'EstoDeberiaEstarCifradoYSerUnico',
+    fecha_ingreso: "2021-02-15",
+    salario: "200",
+    cargo: "Auxiliar Nomina"
   },
   {
     nombre: 'Wilson',
@@ -31,6 +37,9 @@ const usuarios = [
     direccion: 'Av Olaya',
     telefono: '320 1234567',
     token: 'EstoDeberiaEstarCifradoYSerUnico',
+    echa_ingreso: "2021-02-15",
+    salario: "800",
+    cargo: "Jefe de Operaciones"
   },
 ];
 
