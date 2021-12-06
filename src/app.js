@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const usuarios = require('./data_user');
 let vacaciones_req = require('./data_vacaciones');
+let permisos_req = require('./data_permisos');
 
 app.use(cors());
 
@@ -153,11 +154,11 @@ app.post('/vacations_request', (req, res) => {
 });
 
 /**
- * API Rest Solicitud vacaciones
- * Descripcion: Permite solicitar al usuario por medio del id las vacaciones
+ * API Rest  Respuesta vacaciones
+ * Descripcion: Permite responder a las solicitudesde de vacaciones haciendo las busqueda por id
  * Ruta: /vacations_request
  * Metodo: POST
- * Datos entrada: {id, init_date, final_date}
+ * Datos entrada: { id, vac_res }
  * Respuesta: { msg, status, solicitud: new_vac_req }
  */
 app.post('/vacations_response', (req, res) => {
@@ -188,6 +189,92 @@ app.post('/vacations_response', (req, res) => {
   vacaciones_req = [...vac_update];
 
   res.send({ msg, status, vacaciones_req });
+});
+
+/**
+ * API Rest Solicitud permisos
+ * Descripcion: Permite solicitar al usuario por medio del id los permisos
+ * Ruta: /license_request
+ * Metodo: POST
+ * Datos entrada: {id, init_date_license, final_date_license, license_type}
+ * Respuesta: { msg, status, solicitud: new_lice_req }
+ */
+
+ app.post('/license_request', (req, res) => {
+  const { id, init_date_license, final_date_license, license_type} = req.body;
+
+  const id_valid = usuarios.find((us) => us.id === id);
+  console.log(id_valid)
+
+  let msg = '';
+  let status = '';
+
+  if (!id_valid) {
+    msg = 'usuario no valido';
+    status = 400;
+    return res.send({ msg, status, solicitud: null });
+  }
+
+  const new_lice_req = {
+    id: `p-${Date.now()}`,
+    id_user: id,
+    estado: 'Pendiente',
+    fecha_ini: init_date_license,
+    fecha_fin: final_date_license,
+    tipo_permisos: license_type,
+    comentarios: ""
+  };
+
+  permisos_req.push(new_lice_req);
+
+  msg = 'Solicitud guardada';
+  status = 200;
+
+  res.send({ msg, status, solicitud: new_lice_req });
+});
+
+/**
+ * API Rest Solicitud permisos
+ * Descripcion: Permite responder a las solicitudesde de permisos haciendo la busqueda por id
+ * Ruta: /license_request
+ * Metodo: POST
+ * Datos entrada: { id, lice_res, comments }
+ * Respuesta: { msg, status, solicitud: new_lice_req }
+ */
+app.post('/license_response', (req, res) => {
+  const { id, lice_res, comments } = req.body;
+
+  let msg = '';
+  let status = '';
+
+  const lice_req_found = permisos_req.find((lice) => lice.id === id);
+
+  console.log(lice_req_found);
+
+  if (!lice_req_found) {
+    msg = 'Solicitud no valida';
+    status = 400;
+    return res.send({ msg, status, solicitud: null });
+  }
+
+  let i = 0
+  const lice_update = permisos_req.map((lice,index) => {
+    if (lice.id === lice_req_found.id) {
+      lice.estado = lice_res;
+      lice.comentarios = comments;
+      i = index;
+      return lice;
+    } else {
+      return lice;
+    }
+  });
+
+  msg = 'Solicitud modificada';
+  status = 200;
+
+  permisos_req = [...lice_update];
+
+  res.send({ msg, status, permiso: permisos_req[i] });
 });
 
 module.exports = app;
