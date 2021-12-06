@@ -2,7 +2,7 @@ const express = require('express');
 
 const app = express();
 const cors = require('cors');
-const usuarios = require('./data_user');
+let usuarios = require('./data_user');
 let vacaciones_req = require('./data_vacaciones');
 let permisos_req = require('./data_permisos');
 
@@ -77,7 +77,7 @@ app.get('/user_profile/:email', (req, res) => {
  * Datos entrada: {address, phone, id}
  * Respuesta: {  { msg: 'Usuario editado', status: 200, usuario: usuarios[i] }}
  */
-app.post('/user_edit', (req, res) => {
+app.post('/profile_edit', (req, res) => {
   const { address, phone, id } = req.body;
 
   let i = 0;
@@ -311,17 +311,92 @@ app.get('/payment_certificate/:id',(req, res) => {
 })
 
 /**
- * API Rest Solicitud certificado laboral
- * Descripcion: Permite realizar la solicitud de certifiación laboral por medio del id
- * Ruta: /payment_certificate
- * Metodo: GET
- * Datos entrada: { id }
- * Respuesta: { msg, status, data }
+ * API Rest Creación de usuarios
+ * Descripcion: Permite crear usuarios
+ * Ruta: /user_create
+ * Metodo: POST
+ * Datos entrada: { nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo }
+ * Respuesta: { msg, status, data: new_user }
  */
-app.post('/payment_certificate/:id',(req, res) => {
+app.post('/user_create',(req, res) => {
+  const{ nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo } = req.body
+  const id_valid = usuarios.find((us) => us.id === id);
 
+  let msg = '';
+  let status = '';
+
+  if (id_valid) {
+    msg = 'id o documento ya registrado en la base de datos';
+    status = 400;
+    return res.send({ msg, status, data: null });
+  }
+
+  const email_valid = usuarios.find((us) => us.email === email);
+
+  if (email_valid) {
+    msg = 'email ya registrado en la base de datos';
+    status = 400;
+    return res.send({ msg, status, data: null });
+  }
+
+  let new_user = {nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo} 
+  usuarios.push(new_user)
+  msg = "Usuario agregado con exito"
+  status = 200
+  res.send({ msg, status, data: new_user })
 
 })
 
+/**
+ * API Rest Creación de usuarios
+ * Descripcion: Permite crear usuarios
+ * Ruta: /user_create
+ * Metodo: POST
+ * Datos entrada: { nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo }
+ * Respuesta: { msg, status, data: new_user }
+ */
+ app.post('/user_edit',(req, res) => {
+  const{ nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo } = req.body
+  const id_valid = usuarios.find((us) => us.id === id);
+
+  let msg = '';
+  let status = '';
+
+  if (!id_valid) {
+    msg = 'Usuario no encontrado';
+    status = 400;
+    return res.send({ msg, status, data: null });
+
+  }
+
+  let i = 0
+  const user_update = usuarios.map((user, index) => {
+    if (user.id === id_valid.id) {
+      user.nombre = nombre
+      user.apellido = apellido
+      user.id = id
+      user.tipo_usuario = tipo_usuario
+      user.email = email
+      user.password = password
+      user.direccion = direccion
+      user.telefono = telefono
+      user.fecha_ingreso = fecha_ingreso
+      user.salario = salario
+      user.cargo = cargo
+
+      i = index
+      return user;
+    } else {
+      return user;
+    }
+  })
+  usuarios = [...user_update]
+  msg = 'Usuario actualizado con exito';
+    status = 200;
+    res.send({ msg, status, data: usuarios[i] });
+
+
+
+ })
 
 module.exports = app;
