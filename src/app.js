@@ -5,6 +5,7 @@ const cors = require('cors');
 let usuarios = require('./data_user');
 let vacaciones_req = require('./data_vacaciones');
 let permisos_req = require('./data_permisos');
+let pagos_req = require('./data_pagos');
 
 app.use(cors());
 
@@ -43,7 +44,7 @@ app.post('/login_user', (req, res) => {
 });
 
 /**
- * API Rest Perdfil usuario
+ * API Rest Perfil usuario
  * Descripcion: Permite visualizar el perfil del usuario por medio del correo
  * Ruta: /profile_user/:email
  * Metodo: GET
@@ -286,7 +287,7 @@ app.post('/license_response', (req, res) => {
  * Respuesta: { msg, status, data }
  */
 
-app.get('/payment_certificate/:id',(req, res) => {
+app.get('/job_certificate/:id',(req, res) => {
 
   const { id } = req.params;
   const id_valid = usuarios.find((us) => us.id === id);
@@ -348,14 +349,14 @@ app.post('/user_create',(req, res) => {
 })
 
 /**
- * API Rest Creación de usuarios
- * Descripcion: Permite crear usuarios
- * Ruta: /user_create
+ * API Rest Editar usuarios
+ * Descripcion: Permite editar usuarios
+ * Ruta: /user_edit
  * Metodo: POST
  * Datos entrada: { nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo }
  * Respuesta: { msg, status, data: new_user }
  */
- app.post('/user_edit',(req, res) => {
+app.post('/user_edit',(req, res) => {
   const{ nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo } = req.body
   const id_valid = usuarios.find((us) => us.id === id);
 
@@ -394,9 +395,76 @@ app.post('/user_create',(req, res) => {
   msg = 'Usuario actualizado con exito';
     status = 200;
     res.send({ msg, status, data: usuarios[i] });
+})
+
+/**
+ * API Rest Eliminar usuarios
+ * Descripcion: Permite eliminar usuarios por medio del id
+ * Ruta: /user_delete
+ * Metodo: POST
+ * Datos entrada: { id }
+ * Respuesta: { msg, status }
+ */
+
+app.post('/user_delete',(req, res) => {
+  const{ id } = req.body
+  const id_valid = usuarios.find((us) => us.id === id);
+
+  let msg = '';
+  let status = '';
+
+  if (!id_valid) {
+    msg = 'Usuario no encontrado';
+    status = 400;
+    return res.send({ msg, status, data: null });
+
+  }
+  
+  let usuario_eliminado = usuarios.filter(us => us.id !== id );
+  usuarios = [...usuario_eliminado]
+  msg = 'Usuario eliminado con éxito';
+    status = 200;
+    res.send({ msg, status });
+})
 
 
+/**
+ * API Rest Solicitud certificado de pago
+ * Descripcion: Permite solicitar el certificado de pago por medio del id
+ * Ruta: /payment_certificate
+ * Metodo: POST
+ * Datos entrada: { id, periodo }
+ * Respuesta: { msg, status, data: pagos_usuarios }
+ */
 
- })
+ app.post('/payment_certificate',(req, res) => {
+  const{ id, periodo } = req.body
+  const id_valid = pagos_req.find((us) => us.id_user === id); //Validar si el id existe
+
+  let msg = '';
+  let status = '';
+
+  if (!id_valid) {
+    msg = 'Usuario no encontrado';
+    status = 400;
+    return res.send({ msg, status, data: null });
+    
+  }
+
+  let pagos_usuarios = pagos_req.filter(us => us.id_user === id && us.periodo === periodo);
+  
+
+  if (pagos_usuarios.length <= 0) {
+    msg = 'Información no encontrada';
+    status = 400;
+    return res.send({ msg, status, data: null });
+    
+  }
+
+  msg = 'Certificado enviado con éxito';
+  status = 200;
+  res.send({ msg, status, data: pagos_usuarios });
+
+})  
 
 module.exports = app;
