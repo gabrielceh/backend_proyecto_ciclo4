@@ -7,6 +7,7 @@ let vacaciones_req = require('./data_vacaciones');
 let permisos_req = require('./data_permisos');
 let pagos_req = require('./data_pagos');
 
+
 app.use(cors());
 
 app.use(express.json());
@@ -466,5 +467,96 @@ app.post('/user_delete',(req, res) => {
   res.send({ msg, status, data: pagos_usuarios });
 
 })  
+
+
+/**
+ * API Rest Solicitud reporte de salarios
+ * Descripcion: Permite filtrar según salario menor o mayor
+ * Ruta: /salary_reports
+ * Metodo: POST
+ * Datos entrada: { salario_filtro, filtro }
+ * Respuesta1: { msg, status, data: reportes_mas }
+ * Respuesta2: { msg, status, data: reportes_menos }
+ */
+
+app.post('/salary_reports',(req, res) => {
+  const{ salario_filtro, filtro } = req.body
+
+  let status = ""
+  let msg = ""
+
+  if(isNaN(salario_filtro)){
+    msg = `El salario ingresado no es un dato válido`
+    status = 401
+    return res.send({ msg, status });
+
+  }  
+
+
+  switch(filtro) {
+
+    case "MORE":
+      const reportes_mas = usuarios.filter(us => us.salario > salario_filtro);
+      if (reportes_mas.length <= 0) {
+          msg = `No se encontraron reportes con un salario mayor a: "${salario_filtro}"`
+          status = 200
+          return res.send({ msg, status, data: reportes_mas });
+      }
+      else { 
+        msg = `Reporte con un salario mayor a: "${salario_filtro}"`
+        status = 200
+        return res.send({ msg, status, data: reportes_mas });
+      }
+      
+    case "LESS":
+      const reportes_menos = usuarios.filter(us => us.salario <= salario_filtro);
+      if (reportes_menos.length <= 0) {
+          msg = `No se encontraron reportes con un salario menor a: "${salario_filtro}"` //comillas template string
+          status = 200
+          return res.send({ msg, status, data: reportes_menos });
+      }
+      else { 
+        msg = `Reporte con un salario menor a: "${salario_filtro}"`
+        status = 200
+        return res.send({ msg, status, data: reportes_menos });
+      }   
+
+      default: 
+        msg = `Solicitud invalida`
+        status = 400
+        return res.send({ msg, status });
+
+  } 
+})
+
+
+/**
+ * API Rest dashboard
+ * Descripcion: Permite visualizar tableros de control (dashboard)
+ * Ruta: /dashboard
+ * Metodo: GET
+ * Datos entrada: { cantidad_empleados, solicitud_permisos_activos, solicitud_vacaciones_pendientes }
+ * Respuesta: {  }
+ * 
+ */
+
+ app.get('/dashboard',(req, res) => {
+  const{ cantidad_empleados, solicitud_permisos_activos, solicitud_vacaciones_pendientes } = req.body
+
+  let status = ""
+  let msg = ""
+
+
+ })  
+
+
+
+
+
+
+
+
+
+
 
 module.exports = app;
