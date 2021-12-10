@@ -150,7 +150,7 @@ app.post('/vacations_request', (req, res) => {
 
   vacaciones_req.push(new_vac_req);
 
-  msg = 'Solicitud guarada';
+  msg = 'Solicitud guardada';
   status = 200;
 
   res.send({ msg, status, solicitud: new_vac_req });
@@ -159,7 +159,7 @@ app.post('/vacations_request', (req, res) => {
 /**
  * API Rest  Respuesta vacaciones
  * Descripcion: Permite responder a las solicitudesde de vacaciones haciendo las busqueda por id
- * Ruta: /vacations_request
+ * Ruta: /vacations_response
  * Metodo: POST
  * Datos entrada: { id, vac_res }
  * Respuesta: { msg, status, solicitud: new_vac_req }
@@ -239,7 +239,7 @@ app.post('/license_request', (req, res) => {
 /**
  * API Rest Solicitud permisos
  * Descripcion: Permite responder a las solicitudesde de permisos haciendo la busqueda por id
- * Ruta: /license_request
+ * Ruta: /license_response
  * Metodo: POST
  * Datos entrada: { id, lice_res, comments }
  * Respuesta: { msg, status, solicitud: new_lice_req }
@@ -283,7 +283,7 @@ app.post('/license_response', (req, res) => {
 /**
  * API Rest Solicitud certificado laboral
  * Descripcion: Permite realizar la solicitud de certifiación laboral por medio del id
- * Ruta: /payment_certificate
+ * Ruta: /job_certificate/:id
  * Metodo: GET
  * Datos entrada: { id }
  * Respuesta: { msg, status, data }
@@ -527,10 +527,18 @@ app.post('/salary_reports', (req, res) => {
     case 'MORE':
       const reportes_mas = usuarios.filter((us) => us.salario > salario_filtro);
       if (reportes_mas.length <= 0) {
+<<<<<<< HEAD
         msg = `No se encontraron reportes con un salario mayor a: "${salario_filtro}"`;
         status = 200;
         return res.send({ msg, status, data: reportes_mas });
       } else {
+=======
+          msg = `No se encontraron reportes con un salario mayor a: "${salario_filtro}"`
+          status = 200;
+          return res.send({ msg, status, data: reportes_mas });
+      }
+      else { 
+>>>>>>> da36b8a616b0277c1f0391cccf8dd4bc031baf0d
         msg = `Reporte con un salario mayor a: "${salario_filtro}"`;
         status = 200;
         return res.send({ msg, status, data: reportes_mas });
@@ -541,6 +549,7 @@ app.post('/salary_reports', (req, res) => {
         (us) => us.salario <= salario_filtro
       );
       if (reportes_menos.length <= 0) {
+<<<<<<< HEAD
         msg = `No se encontraron reportes con un salario menor a: "${salario_filtro}"`; //comillas template string
         status = 200;
         return res.send({ msg, status, data: reportes_menos });
@@ -549,6 +558,25 @@ app.post('/salary_reports', (req, res) => {
         status = 200;
         return res.send({ msg, status, data: reportes_menos });
       }
+=======
+          msg = `No se encontraron reportes con un salario menor a: "${salario_filtro}"` //comillas template string
+          status = 200;
+          return res.send({ msg, status, data: reportes_menos });
+      }
+      else { 
+        msg = `Reporte con un salario menor a: "${salario_filtro}"`;
+        status = 200;
+        return res.send({ msg, status, data: reportes_menos });
+      }   
+
+      default: 
+        msg = `Solicitud invalida`;
+        status = 400;
+        return res.send({ msg, status });
+
+  } 
+})
+>>>>>>> da36b8a616b0277c1f0391cccf8dd4bc031baf0d
 
     default:
       msg = `Solicitud invalida`;
