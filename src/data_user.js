@@ -7,11 +7,11 @@ const usuarios = [
     email: 'luis@correo.com',
     password: '123',
     direccion: 'calle 12',
-    telefono: '300 1234567',
+    telefono: '3001234567',
     token: 'EstoDeberiaEstarCifradoYSerUnico',
-    fecha_ingreso: "2021-02-15",
-    salario: "500",
-    cargo: "Administrador Funcional"
+    fecha_ingreso: '2021-02-15',
+    salario: '500',
+    cargo: 'Administrador Funcional',
   },
   {
     nombre: 'Andrea',
@@ -21,11 +21,11 @@ const usuarios = [
     email: 'andrea@correo.com',
     password: '123',
     direccion: 'carrera 45',
-    telefono: '315 1234567',
+    telefono: '3151234567',
     token: 'EstoDeberiaEstarCifradoYSerUnico',
-    fecha_ingreso: "2021-02-15",
-    salario: "200",
-    cargo: "Auxiliar Nomina"
+    fecha_ingreso: '2021-02-15',
+    salario: '200',
+    cargo: 'Auxiliar Nomina',
   },
   {
     nombre: 'Wilson',
@@ -35,11 +35,11 @@ const usuarios = [
     email: 'wilson@correo.com',
     password: '123',
     direccion: 'Av Olaya',
-    telefono: '320 1234567',
+    telefono: '3201234567',
     token: 'EstoDeberiaEstarCifradoYSerUnico',
-    echa_ingreso: "2021-02-15",
-    salario: "800",
-    cargo: "Jefe de Operaciones"
+    echa_ingreso: '2021-02-15',
+    salario: '800',
+    cargo: 'Jefe de Operaciones',
   },
 ];
 
