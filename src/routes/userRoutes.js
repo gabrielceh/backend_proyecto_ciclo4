@@ -89,33 +89,26 @@ userRoutes.get('/user_profile/:email', (req, res) => {
  * Datos entrada: {address, phone, id}
  * Respuesta: {  { msg: 'Usuario editado', status: 200, usuario: usuarios[i] }}
  */
-userRoutes.post('/profile_edit', async (req, res) => {
+userRoutes.post('/profile_edit', (req, res) => {
   const { _id, address, phone } = req.body;
   // console.log(req.body);
-  const user = await User.findOne({ _id });
+  User.findOne({ _id }, (error, user) => {
+    if (error) {
+      console.log(error);
+      return res.send({ status: 'error', msg: 'Error' });
+    }
+    if (!user) {
+      return res.status(400).json({ status: 400, msg: 'Usuario invalidado' });
+    }
+    if (user) {
+      user.updateOne(
+        { _id: { $eq: _id } },
+        { $set: { direccion: address, telefono: phone } }
+      );
 
-  if (!user) {
-    return res.status(400).json({ status: 400, msg: 'Usuario invalidado' });
-  }
-
-  const userUpdate = await User.updateOne(
-    { id: { $eq: _id } },
-    { $set: { direccion: address, telefono: phone } }
-  );
-
-  const userProfile = {
-    nombre: user.nombre,
-    apellido: user.apellido,
-    _id: user._id,
-    tipo_usuario: user.tipo_usuario,
-    email: user.email,
-    direccion: user.direccion,
-    telefono: user.telefono,
-    salario: user.salario,
-    cargo: user.cargo,
-  };
-
-  res.send({ status: 'ok', msg: 'Usuario actualizado', data: userProfile });
+      res.send({ status: 'ok', msg: 'Usuario actualizado' });
+    }
+  });
 });
 
 /**
