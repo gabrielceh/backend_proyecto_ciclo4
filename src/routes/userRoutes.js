@@ -106,7 +106,7 @@ userRoutes.post('/profile_edit', (req, res) => {
         { $set: { direccion: address, telefono: phone } }
       );
 
-      res.send({ status: 'ok', msg: 'Usuario actualizado' });
+      res.send({ status: 'ok', msg: 'Usuario actualizado', user: user });
     }
   });
 });
