@@ -2,6 +2,13 @@ const express = require('express');
 
 const app = express();
 const cors = require('cors');
+const mongoose = require('mongoose');
+
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, './.env') });
+
+const { userRoutes } = require('./routes/userRoutes');
+
 let usuarios = require('./data_user');
 let vacaciones_req = require('./data_vacaciones');
 let permisos_req = require('./data_permisos');
@@ -11,111 +18,12 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('El server esta funcionando');
-});
+app.use('/user', userRoutes);
 
-/**
- * API Rest Login usuario
- * Descripcion: Permite encontrar al usuario por medio del correo y del password para iniciar sesión
- * Ruta: /login_user
- * Metodo: POST
- * Datos entrada: {email, paswword}
- * Respuesta: {  msg, status, user: user_find }
- */
-app.post('/login_user', (req, res) => {
-  const { email, password } = req.body;
-  // console.log(req.body);
-
-  const user_find = usuarios.find(
-    (usuario) => usuario.email === email && usuario.password === password
-  );
-  let msg = '';
-  let status = '';
-
-  if (!user_find) {
-    msg = 'Correo o password no validos';
-    status = 400;
-    return res.send({ msg, status, user: null });
-  }
-
-  msg = 'Usuario valido';
-  status = 200;
-
-  res.send({ msg, status, user: user_find });
-});
-
-/**
- * API Rest Perfil usuario
- * Descripcion: Permite visualizar el perfil del usuario por medio del correo
- * Ruta: /profile_user/:email
- * Metodo: GET
- * Datos entrada: {email}
- * Respuesta: {  msg, status, user: user_find }
- */
-app.get('/user_profile/:email', (req, res) => {
-  const { email } = req.params;
-
-  const user_find = usuarios.find((usuario) => usuario.email === email);
-  let msg = '';
-  let status = '';
-
-  if (!user_find) {
-    msg = 'Usuario no encontrado';
-    status = 400;
-    return res.send({ msg, status });
-  }
-
-  msg = 'Perfil usuario encontrado';
-  status = 200;
-
-  res.send({ msg, status, user: user_find });
-});
-
-/**
- * API Rest Editar usuario
- * Descripcion: Permite editar al usuario por medio del id
- * Ruta: /user_edit
- * Metodo: POST
- * Datos entrada: {address, phone, id}
- * Respuesta: {  { msg: 'Usuario editado', status: 200, usuario: usuarios[i] }}
- */
-app.post('/profile_edit', (req, res) => {
-  const { id, address, phone } = req.body;
-
-  let i = 0;
-  let found = false;
-
-  if (isNaN(phone)) {
-    return res.send({
-      msg: 'El telefono debe ser un numero',
-      status: 400,
-      usuario: null,
-    });
-  }
-
-  if (phone.length !== 10) {
-    return res.send({
-      msg: 'El telefono debe tener 10 digitos',
-      status: 400,
-      usuario: null,
-    });
-  }
-
-  for (let user of usuarios) {
-    console.log(user);
-    if (id === user.id) {
-      (user.direccion = address), (user.telefono = phone);
-      found = true;
-      break;
-    }
-    i++;
-  }
-
-  found
-    ? res.send({ msg: 'Usuario editado', status: 200, usuario: usuarios[i] })
-    : res.send({ msg: 'Usuario no encontrado', status: 400, usuario: null });
-});
+mongoose
+  .connect(process.env.MONGODB_SERVER_URL)
+  .then((res) => console.log('conectado a BD'))
+  .catch((error) => console.log(error));
 
 /**
  * API Rest Solicitud vacaciones
@@ -316,66 +224,6 @@ app.get('/job_certificate/:id', (req, res) => {
 });
 
 /**
- * API Rest Creación de usuarios
- * Descripcion: Permite crear usuarios
- * Ruta: /user_create
- * Metodo: POST
- * Datos entrada: { nombre, apellido, id, tipo_usuario, email, password, direccion, telefono, fecha_ingreso, salario, cargo }
- * Respuesta: { msg, status, data: new_user }
- */
-app.post('/user_create', (req, res) => {
-  const {
-    nombre,
-    apellido,
-    id,
-    tipo_usuario,
-    email,
-    password,
-    direccion,
-    telefono,
-    fecha_ingreso,
-    salario,
-    cargo,
-  } = req.body;
-  const id_valid = usuarios.find((us) => us.id === id);
-
-  let msg = '';
-  let status = '';
-
-  if (id_valid) {
-    msg = 'id o documento ya registrado en la base de datos';
-    status = 400;
-    return res.send({ msg, status, data: null });
-  }
-
-  const email_valid = usuarios.find((us) => us.email === email);
-
-  if (email_valid) {
-    msg = 'email ya registrado en la base de datos';
-    status = 400;
-    return res.send({ msg, status, data: null });
-  }
-
-  let new_user = {
-    nombre,
-    apellido,
-    id,
-    tipo_usuario,
-    email,
-    password,
-    direccion,
-    telefono,
-    fecha_ingreso,
-    salario,
-    cargo,
-  };
-  usuarios.push(new_user);
-  msg = 'Usuario agregado con exito';
-  status = 200;
-  res.send({ msg, status, data: new_user });
-});
-
-/**
  * API Rest Editar usuarios
  * Descripcion: Permite editar usuarios
  * Ruta: /user_edit
@@ -433,35 +281,6 @@ app.post('/user_edit', (req, res) => {
   msg = 'Usuario actualizado con exito';
   status = 200;
   res.send({ msg, status, data: usuarios[i] });
-});
-
-/**
- * API Rest Eliminar usuarios
- * Descripcion: Permite eliminar usuarios por medio del id
- * Ruta: /user_delete
- * Metodo: POST
- * Datos entrada: { id }
- * Respuesta: { msg, status }
- */
-
-app.post('/user_delete', (req, res) => {
-  const { id } = req.body;
-  const id_valid = usuarios.find((us) => us.id === id);
-
-  let msg = '';
-  let status = '';
-
-  if (!id_valid) {
-    msg = 'Usuario no encontrado';
-    status = 400;
-    return res.send({ msg, status, data: null });
-  }
-
-  let usuario_eliminado = usuarios.filter((us) => us.id !== id);
-  usuarios = [...usuario_eliminado];
-  msg = 'Usuario eliminado con éxito';
-  status = 200;
-  res.send({ msg, status });
 });
 
 /**
@@ -527,18 +346,10 @@ app.post('/salary_reports', (req, res) => {
     case 'MORE':
       const reportes_mas = usuarios.filter((us) => us.salario > salario_filtro);
       if (reportes_mas.length <= 0) {
-<<<<<<< HEAD
         msg = `No se encontraron reportes con un salario mayor a: "${salario_filtro}"`;
         status = 200;
         return res.send({ msg, status, data: reportes_mas });
       } else {
-=======
-          msg = `No se encontraron reportes con un salario mayor a: "${salario_filtro}"`
-          status = 200;
-          return res.send({ msg, status, data: reportes_mas });
-      }
-      else { 
->>>>>>> da36b8a616b0277c1f0391cccf8dd4bc031baf0d
         msg = `Reporte con un salario mayor a: "${salario_filtro}"`;
         status = 200;
         return res.send({ msg, status, data: reportes_mas });
@@ -549,7 +360,6 @@ app.post('/salary_reports', (req, res) => {
         (us) => us.salario <= salario_filtro
       );
       if (reportes_menos.length <= 0) {
-<<<<<<< HEAD
         msg = `No se encontraron reportes con un salario menor a: "${salario_filtro}"`; //comillas template string
         status = 200;
         return res.send({ msg, status, data: reportes_menos });
@@ -558,25 +368,6 @@ app.post('/salary_reports', (req, res) => {
         status = 200;
         return res.send({ msg, status, data: reportes_menos });
       }
-=======
-          msg = `No se encontraron reportes con un salario menor a: "${salario_filtro}"` //comillas template string
-          status = 200;
-          return res.send({ msg, status, data: reportes_menos });
-      }
-      else { 
-        msg = `Reporte con un salario menor a: "${salario_filtro}"`;
-        status = 200;
-        return res.send({ msg, status, data: reportes_menos });
-      }   
-
-      default: 
-        msg = `Solicitud invalida`;
-        status = 400;
-        return res.send({ msg, status });
-
-  } 
-})
->>>>>>> da36b8a616b0277c1f0391cccf8dd4bc031baf0d
 
     default:
       msg = `Solicitud invalida`;
