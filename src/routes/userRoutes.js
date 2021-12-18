@@ -17,10 +17,10 @@ const userRoutes = Router();
  */
 userRoutes.post('/user_create', (req, res) => {
   const data = req.body;
-  const { id, email } = data;
+  const { _id, email } = data;
   const user = new User(data);
 
-  User.findOne({ $or: [{ id }, { email }] }, (error, u) => {
+  User.findOne({ $or: [{ _id }, { email }] }, (error, u) => {
     if (error) {
       console.log(error);
       return res.send({ status: 'error', msg: 'Error al buscar' });
@@ -28,7 +28,7 @@ userRoutes.post('/user_create', (req, res) => {
     if (u) {
       return res.send({
         status: 'ok',
-        msg: `El documento "${id}" o email "${email}" estan en la base de datos`,
+        msg: `El documento "${_id}" o email "${email}" estan en la base de datos`,
       });
     }
 
@@ -65,7 +65,7 @@ userRoutes.get('/user_profile/:email', (req, res) => {
       const userProfile = {
         nombre: user.nombre,
         apellido: user.apellido,
-        id: user.id,
+        _id: user._id,
         tipo_usuario: user.tipo_usuario,
         email: user.email,
         direccion: user.direccion,
@@ -90,23 +90,23 @@ userRoutes.get('/user_profile/:email', (req, res) => {
  * Respuesta: {  { msg: 'Usuario editado', status: 200, usuario: usuarios[i] }}
  */
 userRoutes.post('/profile_edit', async (req, res) => {
-  const { id, address, phone } = req.body;
+  const { _id, address, phone } = req.body;
   // console.log(req.body);
-  const user = await User.findOne({ id });
+  const user = await User.findOne({ _id });
 
   if (!user) {
     return res.status(400).json({ status: 400, msg: 'Usuario invalidado' });
   }
 
   const userUpdate = await User.updateOne(
-    { id: { $eq: id } },
+    { id: { $eq: _id } },
     { $set: { direccion: address, telefono: phone } }
   );
 
   const userProfile = {
     nombre: user.nombre,
     apellido: user.apellido,
-    id: user.id,
+    _id: user._id,
     tipo_usuario: user.tipo_usuario,
     email: user.email,
     direccion: user.direccion,
@@ -136,7 +136,7 @@ userRoutes.get('/user_list', (req, res) => {
       const usersList = users.map((u) => ({
         nombre: u.nombre,
         apellido: u.apellido,
-        id: u.id,
+        _id: u._id,
         tipo_usuario: u.tipo_usuario,
         email: u.email,
         direccion: u.direccion,
@@ -161,9 +161,9 @@ userRoutes.get('/user_list', (req, res) => {
  * Respuesta: { msg, status }
  */
 userRoutes.post('/user_delete', (req, res) => {
-  const { id } = req.body;
+  const { _id } = req.body;
 
-  User.findOne({ id }, (error, user) => {
+  User.findOne({ _id }, (error, user) => {
     if (error) {
       console.log(error);
       return res.send({ status: 'error', msg: 'Error al buscar' });
@@ -176,7 +176,7 @@ userRoutes.post('/user_delete', (req, res) => {
     }
 
     if (user) {
-      user.deleteOne({ id });
+      user.deleteOne({ _id });
       return res.send({ status: 'ok', msg: 'Usuario eliminado' });
     }
   });
@@ -214,7 +214,7 @@ userRoutes.post('/login_user', async (req, res) => {
     const userProfile = {
       nombre: user.nombre,
       apellido: user.apellido,
-      id: user.id,
+      _id: user._id,
       tipo_usuario: user.tipo_usuario,
       email: user.email,
       direccion: user.direccion,

@@ -11,10 +11,8 @@ const userSchema = new Schema({
     type: 'string',
     require: true,
   },
-  id: {
-    type: 'number',
-    unique: true,
-    require: true,
+  _id: {
+    type: Schema.Types.String,
   },
   tipo_usuario: {
     type: 'number',
