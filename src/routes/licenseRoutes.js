@@ -82,9 +82,9 @@ licenseRoutes.get("/license_search/:id_usuario/:_id", (req, res) => {
                     id_permisos:license._id
                 }
                 console.log(license)
-                res.send({ estado: 'ok', msg: 'Permiso encontrado', data: vacationsList });
+                res.send({ estado: 'ok', msg: 'Permiso encontrado', data: licenseList });
             }
-            if (!vacations) {
+            if (!license) {
                 res.send({ estado: 'ok', msg: 'Permisos NO encontrados' });
             }
         })
