@@ -10,9 +10,9 @@ paymentRoutes.post('/save', (req, res) => {
   const payment = new paymentModel(data);
 
   User.findOne({ _id: id_usuario }, (error, user) => {
-    console.log(user);
+    // console.log(user);
     if (error) {
-      console.log(error);
+      // console.log(error);
       return res.send({ status: 'error', msg: 'Error al buscar' });
     }
     if (!user) {
@@ -21,7 +21,7 @@ paymentRoutes.post('/save', (req, res) => {
     if (user) {
       payment.save((error) => {
         if (error) {
-          console.log(error);
+          // console.log(error);
           return res
             .status(500)
             .send({ status: 'error', msg: 'Error: Pago no generado' });
@@ -44,11 +44,11 @@ paymentRoutes.get('/user_payments/:id_usuario', (req, res) => {
       }
 
       if (pagos) {
-        console.log(pagos);
+        // console.log(pagos);
         const periods = pagos.map((p) => ({
           periodo: p.periodo,
         }));
-        console.log(periods);
+        // console.log(periods);
         res.send({
           status: 'ok',
           msg: 'Certificados encontrados',
@@ -70,7 +70,7 @@ paymentRoutes.get('/payment_certificate/:id_usuario/:periodo', (req, res) => {
     (error, pagos) => {
       User.populate(pagos, { path: 'id_usuario' }, function (error, pagos) {
         if (error) {
-          console.log(error);
+          // console.log(error);
           return res
             .status(500)
             .send({ status: 'error', msg: 'Error al buscar certificado' });

@@ -92,15 +92,18 @@ userRoutes.get('/user_profile/:email', (req, res) => {
 userRoutes.post('/profile_edit', (req, res) => {
   const { _id, address, phone } = req.body;
   // console.log(req.body);
-  User.updateOne({_id:_id}, {$set:{direccion:address, telefono:phone}}, (error, info) => {
-    if (error) {
+  User.updateOne(
+    { _id: _id },
+    { $set: { direccion: address, telefono: phone } },
+    (error, info) => {
+      if (error) {
         console.log(error);
         return res.send({ estado: 'error', msg: 'Error al editar' });
+      } else {
+        res.send({ status: 'ok', msg: 'actualizada', data: info });
+      }
     }
-    else{
-        res.send({status:"ok", msg:"actualizada", data:info})
-    }
-})
+  );
 });
 
 /**
@@ -118,16 +121,25 @@ userRoutes.get('/user_list', (req, res) => {
       return res.send({ estado: 'error', msg: 'Error al buscar' });
     }
     if (users) {
-      const usersList = users.map((u) => ({
+      let usersList = users.map((u) => ({
+        _id: u._id,
         nombre: u.nombre,
         apellido: u.apellido,
-        _id: u._id,
-        tipo_usuario: u.tipo_usuario,
         email: u.email,
         direccion: u.direccion,
         telefono: u.telefono,
+        tipo_usuario: u.tipo_usuario,
         salario: u.salario,
         cargo: u.cargo,
+        fecha_ingreso: `${u.fecha_ingreso.getFullYear()}-${
+          u.fecha_ingreso.getMonth() + 1 < 10
+            ? '0' + (u.fecha_ingreso.getMonth() + 1)
+            : u.fecha_ingreso.getMonth() + 1
+        }-${
+          u.fecha_ingreso.getDate() < 10
+            ? '0' + u.fecha_ingreso.getDate()
+            : u.fecha_ingreso.getDate()
+        }`,
       }));
       res.send({ estado: 'ok', msg: 'Usuarios encontrados', data: usersList });
     }
@@ -217,7 +229,7 @@ userRoutes.post('/login_user', async (req, res) => {
 
 userRoutes.get('/jobs_certificates/:_id', async (req, res) => {
   const { _id } = req.params;
-  User.findOne({_id}, (error, user) => {
+  User.findOne({ _id }, (error, user) => {
     if (error) {
       console.log(error);
       return res.send({ status: 'error', msg: 'Error al buscar' });
@@ -231,18 +243,88 @@ userRoutes.get('/jobs_certificates/:_id', async (req, res) => {
 
     if (user) {
       let certificado = {
-        nombre:user.nombre,
-        apellido:user.apellido,
-        id:user._id,
-        cargo:user.cargo,
-        fecha_ingreso:user.fecha_ingreso,
-        salario:user.salario
-
-      }
-      return res.send({ status: 'ok', msg: 'Certificado generado', data:certificado});
+        nombre: user.nombre,
+        apellido: user.apellido,
+        id: user._id,
+        cargo: user.cargo,
+        fecha_ingreso: user.fecha_ingreso,
+        salario: user.salario,
+      };
+      return res.send({
+        status: 'ok',
+        msg: 'Certificado generado',
+        data: certificado,
+      });
     }
-  })
-  
-})
+  });
+});
+
+userRoutes.get('/user_search/:_id', (req, res) => {
+  const { _id } = req.params;
+
+  User.findOne({ _id }, (error, user) => {
+    if (error) {
+      console.log(error);
+      return res.send({ estado: 'error', msg: 'Error al buscar' });
+    }
+    if (user) {
+      const usersList = {
+        nombre: user.nombre,
+        apellido: user.apellido,
+        _id: user._id,
+        tipo_usuario: user.tipo_usuario,
+        email: user.email,
+        direccion: user.direccion,
+        telefono: user.telefono,
+        salario: user.salario,
+        cargo: user.cargo,
+      };
+      res.send({ estado: 'ok', msg: 'Usuario encontrado', data: usersList });
+    }
+    if (!user) {
+      res.send({ estado: 'ok', msg: 'Usuario NO encontrado' });
+    }
+  });
+});
+
+userRoutes.post('/edit_user', (req, res) => {
+  const {
+    _id,
+    nombre,
+    apellido,
+    email,
+    direccion,
+    telefono,
+    cargo,
+    salario,
+    fecha_ingreso,
+    tipo_usuario,
+  } = req.body;
+  // console.log(req.body);
+  User.updateOne(
+    { _id: _id },
+    {
+      $set: {
+        nombre: nombre,
+        apellido: apellido,
+        email: email,
+        direccion: direccion,
+        telefono: telefono,
+        tipo_usuario: tipo_usuario,
+        cargo: cargo,
+        salario: salario,
+        fecha_ingreso: fecha_ingreso,
+      },
+    },
+    (error, info) => {
+      if (error) {
+        console.log(error);
+        return res.send({ estado: 'error', msg: 'Error al editar' });
+      } else {
+        res.send({ status: 'ok', msg: 'actualizada', data: info });
+      }
+    }
+  );
+});
 
 exports.userRoutes = userRoutes;
