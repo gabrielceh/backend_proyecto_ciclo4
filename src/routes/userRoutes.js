@@ -92,23 +92,15 @@ userRoutes.get('/user_profile/:email', (req, res) => {
 userRoutes.post('/profile_edit', (req, res) => {
   const { _id, address, phone } = req.body;
   // console.log(req.body);
-  User.findOne({ _id }, (error, user) => {
+  User.updateOne({_id:_id}, {$set:{direccion:address, telefono:phone}}, (error, info) => {
     if (error) {
-      console.log(error);
-      return res.send({ status: 'error', msg: 'Error' });
+        console.log(error);
+        return res.send({ estado: 'error', msg: 'Error al editar' });
     }
-    if (!user) {
-      return res.status(400).json({ status: 400, msg: 'Usuario invalidado' });
+    else{
+        res.send({status:"ok", msg:"actualizada", data:info})
     }
-    if (user) {
-      user.updateOne(
-        { _id: { $eq: _id } },
-        { $set: { direccion: address, telefono: phone } }
-      );
-
-      res.send({ status: 'ok', msg: 'Usuario actualizado', user: user });
-    }
-  });
+})
 });
 
 /**
@@ -222,5 +214,35 @@ userRoutes.post('/login_user', async (req, res) => {
 
   return res.status(401).json({ status: 401, msg: 'Credenciales invalidadas' });
 });
+
+userRoutes.get('/jobs_certificates/:_id', async (req, res) => {
+  const { _id } = req.params;
+  User.findOne({_id}, (error, user) => {
+    if (error) {
+      console.log(error);
+      return res.send({ status: 'error', msg: 'Error al buscar' });
+    }
+    if (!user) {
+      return res.send({
+        status: 'ok',
+        msg: 'Usuario No encontrado',
+      });
+    }
+
+    if (user) {
+      let certificado = {
+        nombre:user.nombre,
+        apellido:user.apellido,
+        id:user._id,
+        cargo:user.cargo,
+        fecha_ingreso:user.fecha_ingreso,
+        salario:user.salario
+
+      }
+      return res.send({ status: 'ok', msg: 'Certificado generado', data:certificado});
+    }
+  })
+  
+})
 
 exports.userRoutes = userRoutes;

@@ -9,6 +9,7 @@ require('dotenv').config({ path: path.resolve(__dirname, './.env') });
 
 const { userRoutes } = require('./routes/userRoutes');
 const { paymentRoutes } = require('./routes/paymentRoutes');
+const { vacationsRoutes } = require('./routes/vacationsRoutes');
 
 let usuarios = require('./data_user');
 let vacaciones_req = require('./data_vacaciones');
@@ -21,6 +22,7 @@ app.use(express.json());
 
 app.use('/user', userRoutes);
 app.use('/payment', paymentRoutes);
+app.use('/vacations', vacationsRoutes);
 
 mongoose
   .connect(process.env.MONGODB_SERVER_URL)
