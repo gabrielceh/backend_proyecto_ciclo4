@@ -25,9 +25,7 @@ const licenseSchema = new Schema({
   },
   comentarios: {
     type: 'string',
-    require: true,
   },
-
 });
 
 const licenseModel = mongoose.model('license', licenseSchema);

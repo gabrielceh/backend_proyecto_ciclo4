@@ -247,7 +247,15 @@ userRoutes.get('/jobs_certificates/:_id', async (req, res) => {
         apellido: user.apellido,
         id: user._id,
         cargo: user.cargo,
-        fecha_ingreso: user.fecha_ingreso,
+        fecha_ingreso: `${user.fecha_ingreso.getFullYear()}-${
+          user.fecha_ingreso.getMonth() + 1 < 10
+            ? '0' + (user.fecha_ingreso.getMonth() + 1)
+            : user.fecha_ingreso.getMonth() + 1
+        }-${
+          user.fecha_ingreso.getDate() < 10
+            ? '0' + user.fecha_ingreso.getDate()
+            : user.fecha_ingreso.getDate()
+        }`,
         salario: user.salario,
       };
       return res.send({
@@ -325,6 +333,33 @@ userRoutes.post('/edit_user', (req, res) => {
       }
     }
   );
+});
+
+userRoutes.get('/users_id', (req, res) => {
+  User.find({}, function (error, users) {
+    if (error) {
+      return res
+        .status(500)
+        .send({ status: 'error', msg: 'Error al buscar id' });
+    }
+
+    if (users) {
+      // console.log(pagos);
+      const users_list = users.map((u) => ({
+        usuario_id: u._id,
+      }));
+      // console.log(periods);
+      res.send({
+        status: 'ok',
+        msg: 'ID encontrados',
+        data: users_list,
+      });
+    }
+
+    if (!users) {
+      res.send({ status: 'ok', msg: 'Id NO encontrados' });
+    }
+  });
 });
 
 exports.userRoutes = userRoutes;
