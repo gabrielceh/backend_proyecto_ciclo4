@@ -20,12 +20,10 @@ vacationsRoutes.post('/vacations_request', (req, res) => {
       vacations.save((error) => {
         if (error) {
           // console.log(error);
-          return res
-            .status(500)
-            .send({
-              status: 'error',
-              msg: 'Error: Solicitud de Vacación no generada',
-            });
+          return res.status(500).send({
+            status: 'error',
+            msg: 'Error: Solicitud de Vacación no generada',
+          });
         }
         res
           .status(200)
@@ -52,6 +50,24 @@ vacationsRoutes.get('/vacations_list', (req, res) => {
             id_usuario: v.id_usuario._id,
             estado: v.estado,
             id_vacaciones: v._id,
+            fecha_inicio: `${v.fecha_inicio.getFullYear()}-${
+              v.fecha_inicio.getMonth() + 1 < 10
+                ? '0' + (v.fecha_inicio.getMonth() + 1)
+                : v.fecha_inicio.getMonth() + 1
+            }-${
+              v.fecha_inicio.getDate() < 10
+                ? '0' + v.fecha_inicio.getDate()
+                : v.fecha_inicio.getDate()
+            }`,
+            fecha_fin: `${v.fecha_fin.getFullYear()}-${
+              v.fecha_fin.getMonth() + 1 < 10
+                ? '0' + (v.fecha_fin.getMonth() + 1)
+                : v.fecha_fin.getMonth() + 1
+            }-${
+              v.fecha_fin.getDate() < 10
+                ? '0' + v.fecha_fin.getDate()
+                : v.fecha_fin.getDate()
+            }`,
           }));
           // console.log(vacationsList)
           res.send({
@@ -61,7 +77,7 @@ vacationsRoutes.get('/vacations_list', (req, res) => {
           });
         }
         if (!vacations) {
-          res.send({ estado: 'ok', msg: 'Vacaciones NO encontradas' });
+          res.send({ status: 'ok', msg: 'Vacaciones NO encontradas' });
         }
       }
     );
